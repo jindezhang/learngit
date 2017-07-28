@@ -27,6 +27,8 @@
 
 int wait4touch(int ts);
 bool is_jpeg(char *j_name);
+bool is_bmp(char *b_name);
+
 /* read dir*/
 // 设计好双向循环链表的节点
 typedef struct node
@@ -42,5 +44,10 @@ linklist readpicname( char *argv) ;
 
 /*jpeg.c*/
 void show_jpeg(char *argv);
+int width_mid(int pic_w,int fb_w);
+int height_mid(int pic_h,int fb_h);
+
+/*show bmp*/
+void show_bmp(char *bmp_name);
 
 #endif

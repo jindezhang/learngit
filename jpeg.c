@@ -1,6 +1,6 @@
 #include "common.h"
 
-struct image_info
+struct jpg_info
 {
 	int width;
 	int height;
@@ -42,12 +42,12 @@ read_image_from_file(int fd, unsigned char *jpg_buffer, unsigned long image_size
 }
 
 void write_lcd(unsigned char *FB, struct fb_var_screeninfo *vinfo, 
-				unsigned char *bmp_buffer, struct image_info *imageinfo)
+				unsigned char *bmp_buffer, struct jpg_info *imageinfo)
 {
 	int i = width_mid(imageinfo->width,vinfo->xres);
 	int j = height_mid(imageinfo->height,vinfo->yres);
 	
-	/** FB是填写 **/
+	/** FB是 screen start point**/
 	FB += j*vinfo->xres*vinfo->bits_per_pixel/8+i*vinfo->bits_per_pixel/8;
 
 	int x,y;
@@ -100,7 +100,7 @@ void show_jpeg(char *argv)
 
 	jpeg_start_decompress(&cinfo);
 
-	struct image_info *image_info = calloc(1, sizeof(struct image_info));
+	struct jpg_info *image_info = calloc(1, sizeof(struct jpg_info));
 	if(image_info == NULL)
 	{
 		printf("malloc image_info failed\n");

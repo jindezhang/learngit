@@ -81,7 +81,7 @@ linklist readpicname( char *argv)
 		printf("%s\n",ep->d_name );
 		if(!S_ISREG(fileinfo.st_mode))
 				continue;
-		if(!is_jpeg(ep->d_name))
+		if(!is_jpeg(ep->d_name) && !is_bmp(ep->d_name))
 			continue;
 		
 		if(head->data == 0)

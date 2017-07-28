@@ -1,15 +1,17 @@
 #include "common.h"
 
-
 /**
-	实现简单的JPEG/JPG相册浏览功能。可以判断是否是.jpg/.jpeg文件。程序运行时，识别：./album  ./album dir/..  ./album  xxx.jpeg/.jpg
+	实现简单的JPEG/JPG/bmp相册浏览功能.
+	当图片比屏幕小时候，居中显示。图片大于屏幕分辨率时候，只能显示屏幕的一部份；
+	可以判断是否是.jpg/.jpeg/.bmp文件。
+	程序运行时，识别：./album  ./album dir/..  ./album  xxx.jpeg/.jpg/.bmp
 	程序实现思路：
 	1）判断输入的目录还是文件，如果是文件，直接显示。如果是目录，则2）
-	2）opendir() 获取该目录的指针类型，chdir()进入该目录，把目录中所有JPEG/JPG文件的文件名读取存放。
-	3）判断点击屏幕位置，显示上一张图片 OR 下一张图片。
-	4）显示图片，把文件名传给JPEG/JPG文件解码函数。
+	2）opendir() 获取该目录的指针类型，chdir()进入该目录，把目录中所有JPEG/JPG/BMP文件的文件名读取存放。
+	3）判断点击屏幕位置，点击屏幕中间则退出程序；点击左边或者右边 ，那么显示上一张图片 OR 下一张图片。
+	4）显示图片，把文件名传给JPEG/JPG文件解码函数或者BMP文件解码函数显示。
 **/
-int main(int argc, char *argv[]) //./album  
+int main(int argc, char *argv[]) 
 {
 	
 	if(argc > 2)
@@ -32,7 +34,10 @@ int main(int argc, char *argv[]) //./album
 		stat(target,&fileinfo);
 		if(S_ISREG(fileinfo.st_mode) )
 		{
-			show_jpeg(target);
+			if(is_jpeg(target))
+				show_jpeg(target);
+			else
+				show_bmp(target);
 			return 0;
 		}
 	}
@@ -47,14 +52,21 @@ int main(int argc, char *argv[]) //./album
 		perror("open /dev/input/event0 failed");
 		exit(0);
 	}
-	
+
+	///////////////////
+	/* show picture*/
+	////////////
 	linklist tmp = head;
 	int i;
 	printf("点击屏幕中间可以exit！\n");
+
 	while(1)
 	{
 		printf("%s\n", tmp->data);
-		show_jpeg(tmp->data);
+		if(is_jpeg(tmp->data))
+			show_jpeg(tmp->data);
+		else
+			show_bmp(tmp->data);
 		i = wait4touch(ts);
 		if(i == 1)
 			tmp = tmp->next;
@@ -64,6 +76,7 @@ int main(int argc, char *argv[]) //./album
 	return 0;
 }
 
+
 bool is_jpeg(char *j_name)
 {
 	if(strstr(j_name,".jpeg") == 0 && strstr(j_name,".jpg") == 0)
@@ -72,6 +85,16 @@ bool is_jpeg(char *j_name)
 		return true;
 }
 
+bool is_bmp(char *b_name)
+{
+	if(strstr(b_name,".bmp") == 0 )
+		return false;
+	else
+		return true;
+}
+
+///////////////
+/* get the touch x y ;*/
 int wait4touch(int ts)
 {
 	struct input_event buf;
